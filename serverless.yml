@@ -1,0 +1,37 @@
+service:
+  name: family-goals-service
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  local:
+    DB_DOMAIN: ${env:DB_DOMAIN, "192.168.1.114"}
+    DB_PASSWORD: ${env:DB_PASSWORD, ""}
+    DB_URI_PREFIX: ${env:DB_URI_PREFIX, "mongodb"}
+    DB_USER: ${env:DB_USER, ""}
+  dev:
+    DB_DOMAIN: "dev.kfd2q.mongodb.net"
+    DB_PASSWORD: ${env:DB_PASSWORD, ""}
+    DB_URI_PREFIX: ${env:DB_USER, "mongodb+srv"}
+    DB_USER: "familygoals"
+  production:
+    DB_DOMAIN: "dev.kfd2q.mongodb.net"
+    DB_PASSWORD: ${env:DB_PASSWORD, ""}
+    DB_URI_PREFIX: ${env:DB_USER, "mongodb+srv"}
+    DB_USER: "familygoals"
+provider:
+  name: aws
+  runtime: nodejs14.x
+  environment:
+    DB_AUTH: ${self:custom.${self:custom.stage}.DB_USER}${self:custom.${self:custom.stage}.DB_PASSWORD}
+    DB_DOMAIN: ${self:custom.${self:custom.stage}.DB_DOMAIN}
+    DB_PASSWORD: ${self:custom.${self:custom.stage}.DB_PASSWORD}
+    DB_URI_PREFIX: ${self:custom.${self:custom.stage}.DB_URI_PREFIX}
+    DB_USER: ${self:custom.${self:custom.stage}.DB_USER}
+functions:
+  hello:
+    handler: out/handlers/handler.hello
+    events:
+      - http:
+          method: get
+          path: /hello
+plugins:
+  - serverless-offline
